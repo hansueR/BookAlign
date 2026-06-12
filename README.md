@@ -6,11 +6,11 @@ Pipeline:
 
 ```text
 English EPUB + Chinese EPUB
-→ extract EPUB spine chapters
-→ chapter_map.yml chapter pairing
+→ preview EPUB body units
+→ choose inclusive body ranges
 → English/Chinese sentence splitting
 → multilingual sentence embeddings
-→ monotonic dynamic-programming alignment
+→ windowed monotonic dynamic-programming alignment
 → aligned.xlsx
 → read with pipeline/excel_speaker.py
 ```
@@ -45,46 +45,56 @@ CPU is supported. GPU, CUDA, and Apple MPS are optional.
 
 ## Run
 
+### Step 1: Preview EPUB body ranges
+
 ```bash
-python -m pipeline.run_align \
-  --book-id educated \
+python -m pipeline.preview_body_range \
   --en book/Educated.en.epub \
   --zh book/Educated.zh.epub \
-  --chapter-map book/educated.chapter_map.yml \
-  --model BAAI/bge-m3 \
-  --device auto \
-  --out output/educated/aligned.xlsx
+  --out output/educated/body_preview.html \
+  --open
 ```
 
-For a lower-memory CPU test:
+The HTML shows English and Chinese EPUB units. Choose inclusive ranges from the preview, for example `4:38` and `3:37`; `4:38` includes units 4 through 38.
+
+### Step 2: Run body-range alignment
 
 ```bash
 python -m pipeline.run_align \
   --book-id educated \
+  --mode body-range \
   --en book/Educated.en.epub \
   --zh book/Educated.zh.epub \
-  --chapter-map book/educated.chapter_map.yml \
+  --en-range 4:38 \
+  --zh-range 3:37 \
   --model intfloat/multilingual-e5-small \
   --device cpu \
   --batch-size 16 \
   --out output/educated/aligned.xlsx
 ```
 
-## chapter_map.yml
+Body-range mode does not require `chapter_map.yml`. Range syntax is inclusive `START:END`. Windowed alignment avoids doing one huge full-book DP, and the Excel schema is unchanged.
 
-The map accepts a top-level `chapters` list. Numeric indexes are 0-based EPUB spine-document indexes.
+### Step 3: Open the Excel reader
 
-```yaml
-chapters:
-  - id: ch001
-    en_index: 3
-    zh_index: 2
-  - id: ch002
-    en_index: 4
-    zh_index: 3
+```bash
+python pipeline/excel_speaker.py
 ```
 
-String refs can match `chapter_id`, `href`, title, or a partial href/title.
+## Optional: old chapter-map mode
+
+```bash
+python -m pipeline.run_align \
+  --book-id educated \
+  --mode chapter-map \
+  --en book/Educated.en.epub \
+  --zh book/Educated.zh.epub \
+  --chapter-map book/educated.chapter_map.yml \
+  --model intfloat/multilingual-e5-small \
+  --device cpu \
+  --batch-size 16 \
+  --out output/educated/aligned.chapter_map.xlsx
+```
 
 ## Output schema
 
