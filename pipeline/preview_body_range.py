@@ -8,6 +8,12 @@ import webbrowser
 from .epub_extract import EpubChapter, extract_epub_to_chapters
 
 
+DEFAULT_EN_PREVIEW_CHARS = 500
+DEFAULT_EN_TAIL_CHARS = 500
+DEFAULT_ZH_PREVIEW_CHARS = 180
+DEFAULT_ZH_TAIL_CHARS = 180
+
+
 def _escape(value: object) -> str:
     return html.escape("" if value is None else str(value), quote=True)
 
@@ -71,8 +77,10 @@ def render_html(
     zh_path: str | None,
     en_units: list[EpubChapter] | None,
     zh_units: list[EpubChapter] | None,
-    preview_chars: int,
-    tail_chars: int,
+    en_preview_chars: int,
+    en_tail_chars: int,
+    zh_preview_chars: int,
+    zh_tail_chars: int,
 ) -> str:
     sides = []
     if en_path is not None and en_units is not None:
@@ -81,8 +89,8 @@ def render_html(
                 "English",
                 en_path,
                 en_units,
-                preview_chars=preview_chars,
-                tail_chars=tail_chars,
+                preview_chars=en_preview_chars,
+                tail_chars=en_tail_chars,
             )
         )
     if zh_path is not None and zh_units is not None:
@@ -91,8 +99,8 @@ def render_html(
                 "Chinese",
                 zh_path,
                 zh_units,
-                preview_chars=preview_chars,
-                tail_chars=tail_chars,
+                preview_chars=zh_preview_chars,
+                tail_chars=zh_tail_chars,
             )
         )
 
@@ -231,8 +239,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--en", help="English EPUB path")
     parser.add_argument("--zh", help="Chinese EPUB path")
     parser.add_argument("--out", default="body_preview.html", help="Output HTML path")
-    parser.add_argument("--preview-chars", type=int, default=500)
-    parser.add_argument("--tail-chars", type=int, default=500)
+    parser.add_argument("--preview-chars", type=int, default=DEFAULT_EN_PREVIEW_CHARS)
+    parser.add_argument("--tail-chars", type=int, default=DEFAULT_EN_TAIL_CHARS)
+    parser.add_argument("--en-preview-chars", type=int)
+    parser.add_argument("--en-tail-chars", type=int)
+    parser.add_argument("--zh-preview-chars", type=int)
+    parser.add_argument("--zh-tail-chars", type=int)
     parser.add_argument("--min-chars", type=int, default=20)
     parser.add_argument("--open", action="store_true", help="Open generated HTML in the default browser")
     return parser
@@ -245,14 +257,28 @@ def main() -> None:
 
     en_units = extract_epub_to_chapters(args.en, min_chars=args.min_chars) if args.en else None
     zh_units = extract_epub_to_chapters(args.zh, min_chars=args.min_chars) if args.zh else None
+    en_preview_chars = args.en_preview_chars if args.en_preview_chars is not None else args.preview_chars
+    en_tail_chars = args.en_tail_chars if args.en_tail_chars is not None else args.tail_chars
+    zh_preview_chars = (
+        args.zh_preview_chars
+        if args.zh_preview_chars is not None
+        else DEFAULT_ZH_PREVIEW_CHARS
+    )
+    zh_tail_chars = (
+        args.zh_tail_chars
+        if args.zh_tail_chars is not None
+        else DEFAULT_ZH_TAIL_CHARS
+    )
 
     html_text = render_html(
         en_path=args.en,
         zh_path=args.zh,
         en_units=en_units,
         zh_units=zh_units,
-        preview_chars=args.preview_chars,
-        tail_chars=args.tail_chars,
+        en_preview_chars=en_preview_chars,
+        en_tail_chars=en_tail_chars,
+        zh_preview_chars=zh_preview_chars,
+        zh_tail_chars=zh_tail_chars,
     )
 
     out_path = Path(args.out)
