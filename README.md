@@ -70,8 +70,8 @@ python -m pipeline.run_align \
   --mode body-range \
   --en book/Educated.en.epub \
   --zh book/Educated.zh.epub \
-  --en-range 4:38 \
-  --zh-range 3:37 \
+  --en-range 4:44 \
+  --zh-range 3:43 \
   --model intfloat/multilingual-e5-small \
   --device cpu \
   --batch-size 16 \
