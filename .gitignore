@@ -1,0 +1,13 @@
+.venv/
+**pycache**/
+*.pyc
+.DS_Store
+
+.align_cache/
+.excel_speaker/
+output/
+*.xlsx
+*.xls
+
+book/
+*.epub
