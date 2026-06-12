@@ -1,3 +1,8 @@
+<p align="right">
+  <a href="./README.md">English</a> |
+  <a href="./README.zh.md">中文</a>
+</p>
+
 # Lightweight Chinese-English EPUB Embedding Aligner
 
 This is a first-pass replacement for the old LF Aligner workflow.
