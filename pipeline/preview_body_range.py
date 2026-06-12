@@ -8,10 +8,10 @@ import webbrowser
 from .epub_extract import EpubChapter, extract_epub_to_chapters
 
 
-DEFAULT_EN_PREVIEW_CHARS = 500
-DEFAULT_EN_TAIL_CHARS = 500
+DEFAULT_EN_PREVIEW_CHARS = 300
+DEFAULT_EN_TAIL_CHARS = 150
 DEFAULT_ZH_PREVIEW_CHARS = 180
-DEFAULT_ZH_TAIL_CHARS = 180
+DEFAULT_ZH_TAIL_CHARS = 70
 
 
 def _escape(value: object) -> str:
